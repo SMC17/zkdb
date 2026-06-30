@@ -1,0 +1,8 @@
+.{
+    .name = .zkdb,
+    .fingerprint = 0xc36915f2154c7998,
+    .version = "0.1.0",
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{},
+    .paths = .{""},
+}
