@@ -42,4 +42,19 @@ pub fn build(b: *std.Build) void {
     });
     const bench_step = b.step("bench", "Run benchmarks");
     bench_step.dependOn(&b.addRunArtifact(bench).step);
+
+    // REPL exe
+    const repl_mod = b.createModule(.{
+        .root_source_file = b.path("src/repl.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    repl_mod.addImport("zkdb", mod);
+    const repl = b.addExecutable(.{
+        .name = "zkdb-repl",
+        .root_module = repl_mod,
+    });
+    b.installArtifact(repl);
+    const repl_step = b.step("repl", "Run the q REPL");
+    repl_step.dependOn(&b.addRunArtifact(repl).step);
 }
