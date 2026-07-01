@@ -27,6 +27,10 @@ pub const query = @import("query.zig");
 pub const ipc = @import("ipc.zig");
 pub const persist = @import("persist.zig");
 pub const tick = @import("tick.zig");
+pub const wj = @import("wj.zig");
+pub const lex = @import("lex.zig");
+pub const parse = @import("parse.zig");
+pub const eval = @import("eval.zig");
 
 // Re-export core types
 pub const K = types.K;
@@ -44,4 +48,8 @@ test {
     _ = @import("ipc.zig");
     // persist.zig tests require std.Io context; tested separately
     _ = @import("tick.zig");
+    _ = @import("wj.zig");
+    _ = @import("lex.zig");
+    _ = @import("parse.zig");
+    _ = @import("eval.zig");
 }
