@@ -1,6 +1,6 @@
 # zkdb
 
-Pure-Zig columnar time-series database with q/kdb+ semantics. AGPL-3.0.
+Pure-Zig columnar time-series database with q/kdb+ semantics. Apache-2.0.
 
 kdb+ has dominated high-frequency tick data for 20 years. It costs $10k+/yr, is
 closed-source, and runs only on specific platforms. zkdb captures the core of what
@@ -9,7 +9,7 @@ q IPC binary protocol — rebuilt from first principles in Zig.
 
 ## Status
 
-**Prototype.** 41/41 tests pass, 0 memory leaks. Core algorithms proven.
+**Prototype.** 42/42 tests pass, 0 memory leaks. Core algorithms proven.
 Query planner tuning, distributed operation, and full q language coverage are
 not yet implemented. See [Roadmap](#roadmap).
 
@@ -42,7 +42,7 @@ not yet implemented. See [Roadmap](#roadmap).
 | `query.zig` | Typed predicate DSL: where/select/apply over Table | 3 |
 | `ipc.zig` | q binary wire protocol (kdb+ IPC format) | 5 |
 | `tick.zig` | Ring buffer tick feed | 3 |
-| `persist.zig` | Splay-table on-disk format | (requires std.Io) |
+| `persist.zig` | Splay-table on-disk format | 1 |
 | `lex.zig` | q tokenizer (~50 token types, APL-style verbs) | 5 |
 | `parse.zig` | Right-to-left recursive descent q parser | 4 |
 | `eval.zig` | q evaluator with persistent Env | 5 |
@@ -179,7 +179,7 @@ assignment (:), function call (f x), sum/avg/count/min/max builtins.
 
 ```sh
 zig build              # library + tests
-zig build test         # run 41 tests
+zig build test         # run 42 tests
 zig build bench        # benchmark binary
 zig build repl         # interactive REPL
 ```
@@ -188,7 +188,7 @@ zig build repl         # interactive REPL
 
 The claim: *"kdb+/q performance parity would take a small team of experts multiple years."*
 
-What we demonstrate with 41 tests and one session:
+What we demonstrate with 42 tests and one session:
 
 1. **Typed columnar storage** — trivial in Zig with `[]T` + arena allocator
 2. **SIMD aggregation** — Zig `@Vector` comptime generics beat hand-coded C; single
@@ -234,4 +234,4 @@ Elixir = control plane (OTP supervision, distribution, orchestration).
 
 ## License
 
-AGPL-3.0. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE).
