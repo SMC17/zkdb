@@ -46,7 +46,7 @@ test {
     _ = @import("verbs.zig");
     _ = @import("query.zig");
     _ = @import("ipc.zig");
-    // persist.zig tests require std.Io context; tested separately
+    _ = @import("persist.zig");
     _ = @import("tick.zig");
     _ = @import("wj.zig");
     _ = @import("lex.zig");

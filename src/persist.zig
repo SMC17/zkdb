@@ -28,7 +28,12 @@ comptime {
     std.debug.assert(@sizeOf(ColHeader) == HEADER_SIZE);
 }
 
-pub const WriteError = error{ BadMagic, UnsupportedType };
+pub const WriteError = error{ BadMagic, UnsupportedType, UnexpectedEof };
+
+fn readExact(file: std.Io.File, io: std.Io, buf: []u8, offset: u64) !void {
+    const n = try file.readPositionalAll(io, buf, offset);
+    if (n != buf.len) return WriteError.UnexpectedEof;
+}
 
 /// writeColumn: write a K vector to a column file.
 pub fn writeColumn(io: std.Io, path: []const u8, k: K) !void {
@@ -89,39 +94,63 @@ pub fn readColumn(io: std.Io, allocator: std.mem.Allocator, path: []const u8) !K
     defer file.close(io);
 
     var hdr_buf: [HEADER_SIZE]u8 = undefined;
-    _ = try file.readStreamingAll(io, &hdr_buf);
+    try readExact(file, io, &hdr_buf, 0);
     const hdr: ColHeader = std.mem.bytesToValue(ColHeader, &hdr_buf);
     if (hdr.magic != MAGIC) return WriteError.BadMagic;
 
-    const n = hdr.count;
+    const n: usize = @intCast(hdr.count);
+    var off: u64 = HEADER_SIZE;
     switch (hdr.type_code) {
         7 => {
             const out = try allocator.alloc(i64, n);
+            errdefer allocator.free(out);
             for (out) |*x| {
                 var buf: [8]u8 = undefined;
-                _ = try file.readStreamingAll(io, &buf);
+                try readExact(file, io, &buf, off);
+                off += buf.len;
                 x.* = std.mem.readInt(i64, &buf, .little);
             }
             return K{ .KJ = .{ .items = out } };
         },
         9 => {
             const out = try allocator.alloc(f64, n);
+            errdefer allocator.free(out);
             for (out) |*x| {
                 var buf: [8]u8 = undefined;
-                _ = try file.readStreamingAll(io, &buf);
+                try readExact(file, io, &buf, off);
+                off += buf.len;
                 x.* = @bitCast(std.mem.readInt(u64, &buf, .little));
             }
             return K{ .KF = .{ .items = out } };
         },
         6 => {
             const out = try allocator.alloc(i32, n);
+            errdefer allocator.free(out);
             for (out) |*x| {
                 var buf: [4]u8 = undefined;
-                _ = try file.readStreamingAll(io, &buf);
+                try readExact(file, io, &buf, off);
+                off += buf.len;
                 x.* = std.mem.readInt(i32, &buf, .little);
             }
             return K{ .KI = .{ .items = out } };
         },
         else => return WriteError.UnsupportedType,
     }
+}
+
+test "writeColumn readColumn KJ round-trip" {
+    const io = std.testing.io;
+    const allocator = std.testing.allocator;
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    var path_buf: [128]u8 = undefined;
+    const path = std.fmt.bufPrint(&path_buf, ".zig-cache/tmp/{s}/col.kj", .{&tmp.sub_path}) catch unreachable;
+
+    var items = [_]i64{ -1, 0, 42, 1 << 40 };
+    try writeColumn(io, path, .{ .KJ = .{ .items = &items } });
+
+    const out = try readColumn(io, allocator, path);
+    defer allocator.free(out.KJ.items);
+    try std.testing.expectEqualSlices(i64, &items, out.KJ.items);
 }
