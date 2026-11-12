@@ -2,16 +2,46 @@
 
 Pure-Zig columnar time-series database with q/kdb+ semantics. Apache-2.0.
 
-kdb+ has dominated high-frequency tick data for 20 years. It costs $10k+/yr, is
-closed-source, and runs only on specific platforms. zkdb captures the core of what
-makes it fast — typed columnar vectors, SIMD aggregation, asof join, window join,
-q IPC binary protocol — rebuilt from first principles in Zig.
+The prototype explores typed columnar vectors, aggregation, asof/window joins
+and selected q-style interfaces in Zig. Compatibility and performance require
+their own workload-specific evidence.
 
 ## Status
 
-**Prototype.** 42/42 tests pass, 0 memory leaks. Core algorithms proven.
+**Prototype.** The original baseline passes 42 tests. The column-file task adds
+failure and typed-roundtrip coverage; run the current test target below.
 Query planner tuning, distributed operation, and full q language coverage are
 not yet implemented. See [Roadmap](#roadmap).
+
+## One column-file task
+
+```sh
+zig build test demo -Doptimize=ReleaseSafe --summary all
+```
+
+The demo writes four synthetic integers, closes the file, reopens it and sums
+the loaded column. Expected: `COLUMN_TASK_OK rows=4 sum=17 write_close_reopen=true`.
+Its output file is `zig-out/fixture/ticks.kj`. No service, credentials or hidden
+sibling repository is required.
+
+The reader rejects unknown versions, unsupported types, overflowing declared
+sizes and truncated payloads before allocating the declared column. Unsupported
+writes are rejected before an existing file is opened/truncated. Headers use
+explicit little-endian encoding. Tests cover KJ, KI and KF.
+
+This is a close/reopen check of column storage, not crash durability, atomic
+replacement, WAL recovery, concurrent writers or full q/kdb+ compatibility.
+Keep private while those broader boundaries and a public release are reviewed.
+
+To keep source, logs, the executable and synthetic column together:
+
+```sh
+python3 tools/selfserve.py selfserve.json --repo . --out /tmp/zkdb-selfserve
+```
+
+The shared workflow checks committed source on push/PR/manual/monthly runs.
+An intentional preview tag can publish only after its configured jobs pass;
+configuration alone is not a hosted-pass or public-release claim.
 
 ## Architecture
 
