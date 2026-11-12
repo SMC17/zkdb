@@ -2,9 +2,7 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{
-        .preferred_optimize_mode = .ReleaseFast,
-    });
+    const optimize = b.standardOptimizeOption(.{});
 
     const mod = b.addModule("zkdb", .{
         .root_source_file = b.path("src/root.zig"),
@@ -28,6 +26,17 @@ pub fn build(b: *std.Build) void {
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_tests.step);
+
+    const demo_mod = b.createModule(.{
+        .root_source_file = b.path("examples/persist_demo.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    demo_mod.addImport("zkdb", mod);
+    const demo = b.addExecutable(.{ .name = "zkdb-column-task", .root_module = demo_mod });
+    b.installArtifact(demo);
+    const demo_step = b.step("demo", "Write, close, reopen and query a small column");
+    demo_step.dependOn(&b.addRunArtifact(demo).step);
 
     // Benchmark exe
     const bench_mod = b.createModule(.{

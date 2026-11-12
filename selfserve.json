@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "project": "zkdb",
+  "visibility": "private",
+  "systems": [
+    "Darwin",
+    "Linux"
+  ],
+  "required_files": [
+    "README.md",
+    "LICENSE"
+  ],
+  "task": "Write, close and reopen a synthetic integer column, then check its aggregate.",
+  "steps": [
+    {
+      "name": "unit tests",
+      "argv": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "minimum_tests": 47
+    },
+    {
+      "name": "install fixture binary",
+      "argv": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe"
+      ]
+    },
+    {
+      "name": "synthetic task",
+      "argv": [
+        "zig",
+        "build",
+        "demo",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "contains": "COLUMN_TASK_OK rows=4 sum=17 write_close_reopen=true"
+    }
+  ],
+  "bundle_paths": [
+    "zig-out/bin/zkdb-column-task",
+    "zig-out/fixture/ticks.kj"
+  ],
+  "limitations": [
+    "Column-file close/reopen fixture; no crash durability, WAL, atomic replacement or concurrent writer claim.",
+    "Prototype selected q-style APIs; no full kdb+ compatibility or comparative performance claim.",
+    "Private source/package; public release requires a deliberate visibility and license decision."
+  ]
+}
