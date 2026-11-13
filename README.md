@@ -1,5 +1,7 @@
 # zkdb
 
+**[Status](STATUS.md) · [Roadmap](ROADMAP.md) · [Contributing](CONTRIBUTING.md) · [Issues](https://github.com/SMC17/zkdb/issues) · [All SMC17 work](https://github.com/users/SMC17/projects/16)**
+
 Pure-Zig columnar time-series database with q/kdb+ semantics. Apache-2.0.
 
 The prototype explores typed columnar vectors, aggregation, asof/window joins
