@@ -35,16 +35,6 @@ This is a close/reopen check of column storage, not crash durability, atomic
 replacement, WAL recovery, concurrent writers or full q/kdb+ compatibility.
 Those boundaries are listed in the [Roadmap](#roadmap).
 
-To keep source, logs, the executable and synthetic column together:
-
-```sh
-python3 tools/selfserve.py selfserve.json --repo . --out /tmp/zkdb-selfserve
-```
-
-The shared workflow checks committed source on push/PR/manual/monthly runs.
-An intentional preview tag can publish only after its configured jobs pass;
-configuration alone is not a hosted-pass or public-release claim.
-
 ## Architecture
 
 ```
