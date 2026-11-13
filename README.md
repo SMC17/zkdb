@@ -10,7 +10,7 @@ their own workload-specific evidence.
 
 ## Status
 
-**Prototype.** A fresh clone passes 47/47 tests on Zig 0.16.0 (macOS, aarch64). The column-file task adds
+**Prototype.** A fresh clone passes 50/50 tests on Zig 0.16.0 (macOS, aarch64). The column-file task adds
 failure and typed-roundtrip coverage; run the current test target below.
 Query planner tuning, distributed operation, and full q language coverage are
 not yet implemented. See [Roadmap](#roadmap).
@@ -31,9 +31,12 @@ sizes and truncated payloads before allocating the declared column. Unsupported
 writes are rejected before an existing file is opened/truncated. Headers use
 explicit little-endian encoding. Tests cover KJ, KI and KF.
 
-This is a close/reopen check of column storage, not crash durability, atomic
-replacement, WAL recovery, concurrent writers or full q/kdb+ compatibility.
-Those boundaries are listed in the [Roadmap](#roadmap).
+Writes are atomic: each column is written to a temporary file, fsynced and
+renamed over the old one, so a crash leaves the previous column or the new
+one. Format v2 stores a CRC32 of the payload and reads reject a mismatch.
+Not covered: durability of the latest write across power loss (no directory
+fsync), WAL recovery, concurrent writers and full q/kdb+ compatibility; see
+the [Roadmap](#roadmap).
 
 ## Architecture
 
@@ -201,7 +204,7 @@ assignment (:), function call (f x), sum/avg/count/min/max builtins.
 
 ```sh
 zig build              # library + tests
-zig build test         # 47 tests
+zig build test         # 50 tests
 zig build bench        # benchmark binary
 zig build repl         # interactive REPL
 ```
@@ -210,7 +213,7 @@ zig build repl         # interactive REPL
 
 The claim: *"kdb+/q performance parity would take a small team of experts multiple years."*
 
-What the 47 tests demonstrate:
+What the 50 tests demonstrate:
 
 1. **Typed columnar storage** — trivial in Zig with `[]T` + arena allocator
 2. **SIMD aggregation** — Zig `@Vector` comptime generics beat hand-coded C; single
