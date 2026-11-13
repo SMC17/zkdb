@@ -8,7 +8,7 @@ their own workload-specific evidence.
 
 ## Status
 
-**Prototype.** The original baseline passes 42 tests. The column-file task adds
+**Prototype.** A fresh clone passes 47/47 tests on Zig 0.16.0 (macOS, aarch64). The column-file task adds
 failure and typed-roundtrip coverage; run the current test target below.
 Query planner tuning, distributed operation, and full q language coverage are
 not yet implemented. See [Roadmap](#roadmap).
@@ -31,7 +31,7 @@ explicit little-endian encoding. Tests cover KJ, KI and KF.
 
 This is a close/reopen check of column storage, not crash durability, atomic
 replacement, WAL recovery, concurrent writers or full q/kdb+ compatibility.
-Keep private while those broader boundaries and a public release are reviewed.
+Those boundaries are listed in the [Roadmap](#roadmap).
 
 To keep source, logs, the executable and synthetic column together:
 
@@ -209,7 +209,7 @@ assignment (:), function call (f x), sum/avg/count/min/max builtins.
 
 ```sh
 zig build              # library + tests
-zig build test         # run 42 tests
+zig build test         # 47 tests
 zig build bench        # benchmark binary
 zig build repl         # interactive REPL
 ```
@@ -218,7 +218,7 @@ zig build repl         # interactive REPL
 
 The claim: *"kdb+/q performance parity would take a small team of experts multiple years."*
 
-What we demonstrate with 42 tests and one session:
+What the 47 tests demonstrate:
 
 1. **Typed columnar storage** — trivial in Zig with `[]T` + arena allocator
 2. **SIMD aggregation** — Zig `@Vector` comptime generics beat hand-coded C; single
