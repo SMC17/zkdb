@@ -1,0 +1,14 @@
+# zkdb (`SMC17/zkdb`)
+
+> Columnar time-series database in pure Zig with q/kdb+ semantics: typed vectors, SIMD aggregation, asof and window joins.
+
+## Repository & Docs
+- **Repository**: https://github.com/SMC17/zkdb
+- [README](https://github.com/SMC17/zkdb/blob/main/README.md)
+- [Build](https://github.com/SMC17/zkdb/blob/main/build.zig)
+- [Examples](https://github.com/SMC17/zkdb/tree/main/examples)
+- [Source](https://github.com/SMC17/zkdb/tree/main/src)
+
+## Ecosystem & Author
+- **Unified Substrate (`SMC17/zinging`)**: https://github.com/SMC17/zinging
+- **Author / Org**: https://github.com/SMC17
