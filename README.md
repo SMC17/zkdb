@@ -15,28 +15,20 @@ failure and typed-roundtrip coverage; run the current test target below.
 Query planner tuning, distributed operation, and full q language coverage are
 not yet implemented. See [Roadmap](#roadmap).
 
-## One column-file task
+## Quickstart
 
 ```sh
+# Requires Zig 0.16.0
+git clone https://github.com/SMC17/zkdb.git
+cd zkdb
+zig build test
 zig build test demo -Doptimize=ReleaseSafe --summary all
 ```
 
-The demo writes four synthetic integers, closes the file, reopens it and sums
-the loaded column. Expected: `COLUMN_TASK_OK rows=4 sum=17 write_close_reopen=true`.
-Its output file is `zig-out/fixture/ticks.kj`. No service, credentials or hidden
-sibling repository is required.
+The `demo` target writes four synthetic integers to `zig-out/fixture/ticks.kj`, closes the file, reopens it, and sums the loaded column (expected: `COLUMN_TASK_OK rows=4 sum=17 write_close_reopen=true`).
 
-The reader rejects unknown versions, unsupported types, overflowing declared
-sizes and truncated payloads before allocating the declared column. Unsupported
-writes are rejected before an existing file is opened/truncated. Headers use
-explicit little-endian encoding. Tests cover KJ, KI and KF.
-
-Writes are atomic: each column is written to a temporary file, fsynced and
-renamed over the old one, so a crash leaves the previous column or the new
-one. Format v2 stores a CRC32 of the payload and reads reject a mismatch.
-Not covered: durability of the latest write across power loss (no directory
-fsync), WAL recovery, concurrent writers and full q/kdb+ compatibility; see
-the [Roadmap](#roadmap).
+The column reader rejects unknown versions, unsupported types, overflowing declared sizes, and truncated payloads before allocating, and rejects unsupported writes before opening or truncating an existing file. Headers use explicit little-endian encoding (covering `KJ`, `KI`, and `KF`), writes are atomic via temporary file + `fsync` + rename, and format v2 verifies a payload CRC32.
+Not covered: directory `fsync` durability across power loss, WAL recovery, concurrent writers, and full q/kdb+ compatibility; see the [Roadmap](#roadmap).
 
 ## Architecture
 
